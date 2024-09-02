@@ -12,6 +12,7 @@ import com.mm4096.midicontroller.jobjects.Labels;
 public class HomePanel extends BasePanel implements ActionListener {
     private final JButton patchEdit;
     private final JButton quitButton;
+    private final JButton performanceButton;
 
     public HomePanel() {
         this.id = "home";
@@ -29,6 +30,13 @@ public class HomePanel extends BasePanel implements ActionListener {
         this.add(label);
 
         this.add(Box.createRigidArea(new Dimension(0, 50)));
+
+        performanceButton = Buttons.getStyledButton("Performance Mode");
+        performanceButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        performanceButton.addActionListener(this);
+        this.add(performanceButton);
+
+        this.add(Box.createRigidArea(new Dimension(0, 25)));
 
         patchEdit = Buttons.getStyledButton("Edit/Create Patches");
         patchEdit.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -49,6 +57,9 @@ public class HomePanel extends BasePanel implements ActionListener {
         }
         if (actionEvent.getSource() == quitButton) {
             System.exit(0);
+        }
+        if (actionEvent.getSource() == performanceButton) {
+            this.getMainFrame().changePanel("performance");
         }
     }
 

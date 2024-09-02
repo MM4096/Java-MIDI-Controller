@@ -19,4 +19,8 @@ public class DialogCreator {
     public static String showInputDialog(String title, String message) {
         return JOptionPane.showInputDialog(null, message, title);
     }
+
+    public static String showOptionDialog(String title, String message, String[] options) {
+        return (String) JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+    }
 }

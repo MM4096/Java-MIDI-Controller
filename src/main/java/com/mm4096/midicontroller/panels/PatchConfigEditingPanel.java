@@ -187,6 +187,7 @@ public class PatchConfigEditingPanel extends BasePanel implements ActionListener
             boolean isPatch = JOptionPane.showConfirmDialog(this,
                     "Do you want to create a patch file? (if not, creates a config file instead)",
                     "File Type", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+            String selectedOption = DialogCreator.showOptionDialog("File Type", "Select the type of file you want to create", new String[]{"Patch", "Config", "Song List"});
 
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

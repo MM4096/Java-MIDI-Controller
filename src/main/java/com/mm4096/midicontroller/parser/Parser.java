@@ -3,17 +3,15 @@ package com.mm4096.midicontroller.parser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.mm4096.midicontroller.classes.ConfigClass;
 import com.mm4096.midicontroller.classes.PatchClass;
 import com.mm4096.midicontroller.classes.PatchListClass;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import com.mm4096.midicontroller.midi.MidiKeyboard;
+import com.mm4096.midicontroller.tools.FileHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,9 +58,8 @@ public class Parser {
 
             return configList.toArray(new ConfigClass[0]);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new JSONException("String wasn't of type \"Config!\"");
         }
-        return new ConfigClass[0];
     }
 
     public PatchClass[] parseAsPatch() throws ParseException, JSONException {
@@ -158,5 +155,56 @@ public class Parser {
         ConfigClass[] configs = new Parser(configData).parseAsConfig();
 
         return new PatchListClass(patchName, patches, configs);
+    }
+
+    public PerformanceItem[] getPerformanceList() throws ParseException, RecursionException {
+        PatchListClass patchList;
+        try {
+            patchList = this.parseAsPatchFile();
+        } catch (ParseException e) {
+            String error = "Error while parsing as an int list: " + e;
+            throw new ParseException(error, 1);
+        }
+
+        ConfigClass[] configs = patchList.getConfigList();
+        ArrayList<ConfigClass> finalConfigs = new ArrayList<>();
+        for (ConfigClass config : configs) {
+            if (config.getAlias().equalsIgnoreCase("preset")) {
+                String configPath = config.getBankId();
+                configPath = configPath.replace("\"", "");
+                if (!FileHelper.fileExists(FileHelper.getConfigDirectory() + "/" + configPath + ".midiconfig")) {
+                    throw new ConfigNotFoundException("File doesn't exist: " + configPath + ".midiconfig");
+                }
+                String configData = FileHelper.readFromFile(FileHelper.getConfigDirectory() + "/" + configPath + ".midiconfig");
+                ConfigClass[] newConfigs = new Parser(configData).parseAsConfig();
+                Collections.addAll(finalConfigs, newConfigs);
+            }
+            else {
+                finalConfigs.add(config);
+            }
+        }
+
+        PerformanceItem[] finalList = new PerformanceItem[patchList.getPatchList().length];
+        for (int i = 0; i < patchList.getPatchList().length; i++) {
+            PatchClass patch = patchList.getPatchList()[i];
+
+            boolean found = false;
+            for (ConfigClass config : finalConfigs) {
+                if (config.getAlias().equalsIgnoreCase(patch.getSound())) {
+                    finalList[i] = new PerformanceItem(config.getBankId(), patch.getSound(), patch.getComments());
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                finalList[i] = new PerformanceItem(patch.getSound(), patch.getSound(), patch.getComments());
+            }
+
+            if (!MidiKeyboard.isValidProgramNumber(finalList[i].getPatch())) {
+                throw new ParseException("Invalid program number: " + finalList[i].getPatch(), 0);
+            }
+        }
+        return finalList;
     }
 }

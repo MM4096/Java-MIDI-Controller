@@ -89,4 +89,12 @@ public class FileHelper {
     public static boolean fileExists(String path) {
         return Paths.get(path).toFile().exists();
     }
+
+    public static String removePatchPath(String path) {
+        return path.replace(getPatchDirectory() + "/", "");
+    }
+
+    public static String getPatchPath(String path) {
+        return Paths.get(getPatchDirectory(), path).toString();
+    }
 }

@@ -53,25 +53,33 @@ public class Compiler {
         module.addSerializer(ConfigClass.class, new ConfigClassSerializer());
         objectMapper.registerModule(module);
 
-        if (type == CompilerType.CONFIG) {
-            try {
-                return objectMapper.writeValueAsString(configs);
+        switch (type) {
+            case CONFIG -> {
+                try {
+                    return objectMapper.writeValueAsString(configs);
+                }
+                catch (JsonProcessingException e) {
+                    throw new CompileException("Error parsing config: JSON Parse Error", 0);
+                }
             }
-            catch (JsonProcessingException e) {
-                throw new CompileException("Error parsing config: JSON Parse Error", 0);
+            case PATCH -> {
+                System.out.println("This isn't a thing yet?");
+                return "";
             }
-        } else if (type == CompilerType.PATCH) {
-            return "";
-        } else if (type == CompilerType.PATCHLIST) {
-            Map<String, PatchClass[]> map = new HashMap<>();
-            map.put("list", patchList);
-            try {
-                return objectMapper.writeValueAsString(map);
+            case PATCHLIST -> {
+                Map<String, PatchClass[]> map = new HashMap<>();
+                map.put("list", patchList);
+                try {
+                    return objectMapper.writeValueAsString(map);
+                }
+                catch (JsonProcessingException e) {
+                    throw new CompileException("Error parsing patch list: JSON Parse Error", 0);
+                }
             }
-            catch (JsonProcessingException e) {
-                throw new CompileException("Error parsing patch list: JSON Parse Error", 0);
+            default -> {
+                System.out.println("Something wasn't supported!");
+                return "";
             }
         }
-        return "";
     }
 }
