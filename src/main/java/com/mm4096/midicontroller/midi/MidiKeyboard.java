@@ -3,14 +3,26 @@ package com.mm4096.midicontroller.midi;
 import javax.sound.midi.*;
 import java.util.regex.Pattern;
 
+/**
+ * Class to represent a MIDI keyboard
+ */
 public class MidiKeyboard {
     private final MidiDevice midiDevice;
     private int channel = 0;
 
+    /**
+     * Constructor
+     * @param midiDevice The MIDI device
+     */
     public MidiKeyboard(MidiDevice midiDevice) {
         this.midiDevice = midiDevice;
     }
 
+    /**
+     * Constructor
+     * @param midiDevice The MIDI device
+     * @param channel The channel to use
+     */
     public MidiKeyboard(MidiDevice midiDevice, int channel) {
         this.midiDevice = midiDevice;
         this.channel = channel;
@@ -28,20 +40,44 @@ public class MidiKeyboard {
         this.channel = channel;
     }
 
+    /**
+     * Opens the MIDI device
+     * @throws MidiUnavailableException If the MIDI device is unavailable
+     */
     public void open() throws MidiUnavailableException {
         midiDevice.open();
     }
 
+    /**
+     * Closes the MIDI device
+     */
     public void close() {
         midiDevice.close();
     }
 
+    /**
+     * Changes the instrument based on an integer
+     *
+     * @param programNumber The program number to change to (0-127). For more instruments, use {@link #changeInstrument(int, int)}
+     *
+     * @throws InvalidMidiDataException If the MIDI data is invalid
+     * @throws MidiUnavailableException If the MIDI device is unavailable
+     */
     public void changeInstrument(int programNumber) throws InvalidMidiDataException, MidiUnavailableException {
         ShortMessage message = new ShortMessage();
         message.setMessage(ShortMessage.PROGRAM_CHANGE, channel, programNumber, 0);
         midiDevice.getReceiver().send(message, -1);
     }
 
+    /**
+     * Changes the instrument based on a program number and bank number
+     *
+     * @param programNumber The program number to change to (0-127)
+     * @param bankNumber The bank number to change to (0-127)
+     *
+     * @throws InvalidMidiDataException If the MIDI data is invalid
+     * @throws MidiUnavailableException If the MIDI device is unavailable
+     */
     public void changeInstrument(int programNumber, int bankNumber) throws InvalidMidiDataException, MidiUnavailableException {
         ShortMessage bankSelectMSB = new ShortMessage();
         ShortMessage bankSelectLSB = new ShortMessage();
@@ -60,10 +96,9 @@ public class MidiKeyboard {
     }
 
     /**
-     * Changes the instrument based on a program number and bank number.
+     * Changes the instrument based on a program number and bank number, in String form.
      *
-     *
-     * @param programNumber The program number to change to. This should match the format [a-h][0-127]
+     * @param programNumber The program number to change to. This should match the format [a-h][0-127] or [0-127]
      * @param useProgramMode Whether to use program mode or not. If false, bank (favourites) mode will be used.
      *
      * @throws InvalidMidiDataException If the MIDI data is invalid

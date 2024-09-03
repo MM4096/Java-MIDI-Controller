@@ -7,6 +7,7 @@ public class PerformanceItem {
 
     public PerformanceItem(String patch, String comments) {
         this.patch = patch;
+        this.patchName = patch;
         this.comments = comments;
     }
 

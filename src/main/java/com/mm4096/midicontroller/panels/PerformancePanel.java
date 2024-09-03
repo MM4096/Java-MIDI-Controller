@@ -9,6 +9,7 @@ import com.mm4096.midicontroller.parser.PerformanceItem;
 import com.mm4096.midicontroller.tools.DialogCreator;
 import com.mm4096.midicontroller.tools.FileHelper;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -230,6 +231,11 @@ public class PerformancePanel extends BasePanel {
         });
         performanceListPanel.setFocusable(true);
         performanceListPanel.requestFocus();
+        try {
+            midiKeyboard.open();
+        } catch (MidiUnavailableException e) {
+            DialogCreator.showErrorDialog("Error", "Error while opening MIDI device: " + e);
+        }
     }
 
     private void updatePerformancePanel() {

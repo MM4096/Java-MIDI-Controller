@@ -7,6 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+/**
+ * Main frame for the application
+ */
 public class MainFrame extends JFrame implements ActionListener {
     public ArrayList<BasePanel> panels = new ArrayList<>();
     private JFrame frame;
